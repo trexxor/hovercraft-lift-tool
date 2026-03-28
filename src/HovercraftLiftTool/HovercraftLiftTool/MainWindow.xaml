@@ -1,0 +1,489 @@
+<Window x:Class="HovercraftLiftTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:HovercraftLiftTool"
+        Title="Hovercraft Lift Tool"
+        MinWidth="820" MinHeight="700"
+        Width="860" Height="900"
+        FontFamily="Segoe UI" FontSize="12">
+
+    <Window.Resources>
+        <local:BoolToFieldBrushConverter x:Key="BoolToFieldBrush"/>
+    </Window.Resources>
+
+    <DockPanel>
+
+        <!-- ===== Title bar ===== -->
+        <Border DockPanel.Dock="Top" Background="#2C3E6A" Padding="12,8">
+            <TextBlock Text="Hovercraft Lift Tool" Foreground="White"
+                       FontSize="16" FontWeight="Bold"/>
+        </Border>
+
+        <!-- ===== Buttons bar ===== -->
+        <Border DockPanel.Dock="Bottom" Background="#F0F0F0"
+                BorderBrush="#CCCCCC" BorderThickness="0,1,0,0" Padding="8,6">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Style="{StaticResource CmdButton}"
+                        Content="Record Scenario"
+                        Command="{Binding RecordScenarioCommand}"/>
+                <Button Style="{StaticResource CmdButton}"
+                        Content="Reset"
+                        Command="{Binding ResetCommand}"/>
+                <Button Style="{StaticResource CmdButton}"
+                        Content="Clear"
+                        Command="{Binding ClearCommand}"/>
+                <Button Style="{StaticResource CmdButton}"
+                        Content="Export CSV"
+                        Command="{Binding ExportCsvCommand}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Scenario log (bottom section) ===== -->
+        <GroupBox DockPanel.Dock="Bottom" Header="Scenario Log" Height="180" Margin="6,0,6,4">
+            <DataGrid ItemsSource="{Binding ScenarioLog}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      GridLinesVisibility="All"
+                      FontFamily="Consolas" FontSize="11"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="#"           Binding="{Binding ScenarioNum}"  Width="35"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Timestamp"   Binding="{Binding Timestamp}"    Width="140" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}"  Width="120"/>
+                    <DataGridTextColumn Header="Units"       Binding="{Binding UnitSystem}"   Width="90"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Pressure"    Binding="{Binding PressureMode}" Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="W_ls"        Binding="{Binding W_ls, StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="W_dw"        Binding="{Binding W_dw, StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="W_tot"       Binding="{Binding W_tot, StringFormat=G5}"   Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="L_c"         Binding="{Binding L_c,  StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="B_c"         Binding="{Binding B_c,  StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="A_c"         Binding="{Binding A_c,  StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="D_sk"        Binding="{Binding D_sk, StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="D_ag"        Binding="{Binding D_ag, StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="D_c"         Binding="{Binding D_c,  StringFormat=G5}"    Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="p_ca"        Binding="{Binding P_ca, StringFormat=G5}"    Width="80"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Δp"          Binding="{Binding Delta_p, StringFormat=G5}" Width="80"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="v_out"       Binding="{Binding V_out, StringFormat=G5}"   Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="V_dot"       Binding="{Binding V_dot, StringFormat=G5}"   Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="m_dot"       Binding="{Binding M_dot, StringFormat=G5}"   Width="70"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="C_d"         Binding="{Binding C_d,  StringFormat=G4}"    Width="55"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="η"           Binding="{Binding Eta,  StringFormat=G4}"    Width="55"  IsReadOnly="True"/>
+                    <DataGridTextColumn Header="P_f"         Binding="{Binding P_f,  StringFormat=G5}"    Width="80"  IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- ===== Main scrollable content ===== -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="6,6,6,0">
+
+                <!-- ===== Global toggles row ===== -->
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Unit system -->
+                    <GroupBox Grid.Column="0" Header="Unit System">
+                        <StackPanel Orientation="Horizontal" Margin="4,2">
+                            <RadioButton Content="US Customary"
+                                         IsChecked="{Binding IsUS}"/>
+                            <RadioButton Content="SI / Metric"
+                                         IsChecked="{Binding IsSI}"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Pressure mode -->
+                    <GroupBox Grid.Column="1" Header="Pressure Mode">
+                        <StackPanel Orientation="Horizontal" Margin="4,2">
+                            <RadioButton Content="Absolute"
+                                         IsChecked="{Binding IsAbsolute}"/>
+                            <RadioButton Content="Gauge"
+                                         IsChecked="{Binding IsGauge}"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+
+                <!-- ===== Two-column main layout ===== -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ===== LEFT COLUMN ===== -->
+                    <StackPanel Grid.Column="0">
+
+                        <!-- Weight group -->
+                        <GroupBox Header="Weight">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- W_ls -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}"
+                                           Text="Lightship   W_ls" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1"
+                                           Style="{StaticResource InputBox}"
+                                           Text="{Binding Wls, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveWls}"
+                                           Background="{Binding WlsEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}"
+                                           Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve W_ls"
+                                             IsChecked="{Binding SolveWls}" VerticalAlignment="Center"/>
+
+                                <!-- W_dw -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}"
+                                           Text="Deadweight  W_dw" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1"
+                                           Style="{StaticResource InputBox}"
+                                           Text="{Binding Wdw, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveWdw}"
+                                           Background="{Binding WdwEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}"
+                                           Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve W_dw"
+                                             IsChecked="{Binding SolveWdw}" VerticalAlignment="Center"/>
+
+                                <!-- W_tot -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}"
+                                           Text="Total weight  W_tot" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="2" Grid.Column="1"
+                                           Style="{StaticResource InputBox}"
+                                           Text="{Binding Wtot, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveWtot}"
+                                           Background="{Binding WtotEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}"
+                                           Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="2" Grid.Column="3" Content="Solve W_tot"
+                                             IsChecked="{Binding SolveWtot}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Center of Gravity group (display only) -->
+                        <GroupBox Header="Center of Gravity  (display only)">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Long. CG  LCG"     VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding LCG, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="3" Style="{StaticResource FieldLabel}" Text="Trans. CG  TCG"    VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="4" Style="{StaticResource InputBox}"
+                                           Text="{Binding TCG, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="5" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Vert. CG fwd VCGf"  VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding VCGf, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="3" Style="{StaticResource FieldLabel}" Text="Vert. CG csh VCGc"  VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="4" Style="{StaticResource InputBox}"
+                                           Text="{Binding VCGc, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="5" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Cushion Geometry group -->
+                        <GroupBox Header="Cushion Geometry">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- L_c -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion length  L_c" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Lc, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveLc}"
+                                           Background="{Binding LcEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve L_c" IsChecked="{Binding SolveLc}" VerticalAlignment="Center"/>
+
+                                <!-- B_c -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion beam    B_c" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Bc, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveBc}"
+                                           Background="{Binding BcEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve B_c" IsChecked="{Binding SolveBc}" VerticalAlignment="Center"/>
+
+                                <!-- A_c -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion area    A_c" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="2" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Ac, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveAc}"
+                                           Background="{Binding AcEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding AreaUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="2" Grid.Column="3" Content="Solve A_c" IsChecked="{Binding SolveAc}" VerticalAlignment="Center"/>
+
+                                <!-- D_sk -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Skirt depth     D_sk" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="3" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Dsk, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveDsk}"
+                                           Background="{Binding DskEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="3" Grid.Column="3" Content="Solve D_sk" IsChecked="{Binding SolveDsk}" VerticalAlignment="Center"/>
+
+                                <!-- D_ag -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Air gap depth   D_ag" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="4" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Dag, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveDag}"
+                                           Background="{Binding DagEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="4" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="4" Grid.Column="3" Content="Solve D_ag" IsChecked="{Binding SolveDag}" VerticalAlignment="Center"/>
+
+                                <!-- D_c -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion depth   D_c" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="5" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Dc, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveDc}"
+                                           Background="{Binding DcEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="5" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="5" Grid.Column="3" Content="Solve D_c" IsChecked="{Binding SolveDc}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+
+                    </StackPanel>
+
+                    <!-- ===== RIGHT COLUMN ===== -->
+                    <StackPanel Grid.Column="1">
+
+                        <!-- Atmosphere group -->
+                        <GroupBox Header="Atmosphere">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Ambient pressure  p_a" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Pa, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding PressureUnit}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Air density  ρ" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Rho, StringFormat=F5, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding DensityUnit}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Flow Coefficients -->
+                        <GroupBox Header="Flow Coefficients">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Discharge coeff  C_d" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Cd, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Column="2" Style="{StaticResource UnitLabel}" Text="[ — ]" VerticalAlignment="Center"/>
+
+                                <TextBox   Grid.Column="3" Style="{StaticResource LockedBox}" Text="C_v  —" Margin="0,3"/>
+                                <TextBox   Grid.Column="5" Style="{StaticResource LockedBox}" Text="C_c  —" Margin="0,3"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Pressure and Flow Results -->
+                        <GroupBox Header="Pressure &amp; Flow Results">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- p_ca -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion pressure  p_ca" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Pca, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolvePca}"
+                                           Background="{Binding PcaEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding PressureUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve p_ca" IsChecked="{Binding SolvePca}" VerticalAlignment="Center"/>
+
+                                <!-- delta_p -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Pressure diff.  Δp" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding DeltaP, StringFormat=F6, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveDeltaP}"
+                                           Background="{Binding DeltaPEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding DeltaPUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve Δp" IsChecked="{Binding SolveDeltaP}" VerticalAlignment="Center"/>
+
+                                <!-- theta (reserved) -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Skirt angle  θ" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="2" Grid.Column="1" Style="{StaticResource LockedBox}" Text="—" Margin="0,3"/>
+                                <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="deg" VerticalAlignment="Center"/>
+
+                                <!-- Per_ag (calculated) -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Air gap perimeter  Per_ag" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="3" Grid.Column="1" Style="{StaticResource CalcBox}"
+                                           Text="{Binding Perag, StringFormat=F3, Mode=OneWay}" Margin="0,3"/>
+                                <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+
+                                <!-- A_ag (calculated) -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Air gap area  A_ag" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="4" Grid.Column="1" Style="{StaticResource CalcBox}"
+                                           Text="{Binding Aag, StringFormat=F4, Mode=OneWay}" Margin="0,3"/>
+                                <TextBlock Grid.Row="4" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding AreaUnit}" VerticalAlignment="Center"/>
+
+                                <!-- v_out (calculated) -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Jet velocity  v_out" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="5" Grid.Column="1" Style="{StaticResource CalcBox}"
+                                           Text="{Binding Vout, StringFormat=F3, Mode=OneWay}" Margin="0,3"/>
+                                <TextBlock Grid.Row="5" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding VelUnit}" VerticalAlignment="Center"/>
+
+                                <!-- V_dot (calculated) -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Volumetric flow  V̇" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="6" Grid.Column="1" Style="{StaticResource CalcBox}"
+                                           Text="{Binding Vdot, StringFormat=F3, Mode=OneWay}" Margin="0,3"/>
+                                <TextBlock Grid.Row="6" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding VolFlowUnit}" VerticalAlignment="Center"/>
+
+                                <!-- m_dot (calculated) -->
+                                <TextBlock Grid.Row="7" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Mass flow  ṁ" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="7" Grid.Column="1" Style="{StaticResource CalcBox}"
+                                           Text="{Binding Mdot, StringFormat=F5, Mode=OneWay}" Margin="0,3"/>
+                                <TextBlock Grid.Row="7" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding MassFlowUnit}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Fan Power group -->
+                        <GroupBox Header="Fan Power">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="95"/>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- eta -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Fan efficiency  η" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="0" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Eta, StringFormat=F4, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolveEta}"
+                                           Background="{Binding EtaEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="[ — ]" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve η" IsChecked="{Binding SolveEta}" VerticalAlignment="Center"/>
+
+                                <!-- P_f -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Fan power  P_f" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding Pf, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           IsReadOnly="{Binding SolvePf}"
+                                           Background="{Binding PfEnabled, Converter={StaticResource BoolToFieldBrush}}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding PowerUnit}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve P_f" IsChecked="{Binding SolvePf}" VerticalAlignment="Center"/>
+
+                                <!-- Reserved fan geometry row -->
+                                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+                                            Orientation="Horizontal" Margin="0,3">
+                                    <TextBlock Text="R_fan:" Width="50" VerticalAlignment="Center" Foreground="#888"/>
+                                    <TextBox Style="{StaticResource LockedBox}" Text="—" Width="70" Margin="0,0,12,0"/>
+                                    <TextBlock Text="A_fan:" Width="50" VerticalAlignment="Center" Foreground="#888"/>
+                                    <TextBox Style="{StaticResource LockedBox}" Text="—" Width="70" Margin="0,0,12,0"/>
+                                    <TextBlock Text="N_fan:" Width="50" VerticalAlignment="Center" Foreground="#888"/>
+                                    <TextBox Style="{StaticResource LockedBox}" Text="—" Width="70"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

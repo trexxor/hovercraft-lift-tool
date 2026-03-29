@@ -31,6 +31,11 @@ public partial class MainWindow : Window
         if (e.Key == System.Windows.Input.Key.Return ||
             e.Key == System.Windows.Input.Key.Tab)
         {
+            // Push the typed value to the ViewModel before recalculating —
+            // without this the binding (UpdateSourceTrigger=LostFocus) hasn't
+            // fired yet and the field would revert to its previous value.
+            if (sender is TextBox tb)
+                tb.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
             _vm.RecalculateCommand.Execute(null);
         }
     }

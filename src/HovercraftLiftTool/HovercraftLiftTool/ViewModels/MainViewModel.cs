@@ -113,7 +113,7 @@ public class MainViewModel : INotifyPropertyChanged
         get => !_useGauge;
         set
         {
-            if (_useGauge == value) return;
+            if (!_useGauge == value) return;  // already in requested state
             _useGauge = !value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsGauge));

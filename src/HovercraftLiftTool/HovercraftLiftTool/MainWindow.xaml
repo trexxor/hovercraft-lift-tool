@@ -90,9 +90,9 @@
                     <!-- Unit system -->
                     <GroupBox Grid.Column="0" Header="Unit System">
                         <StackPanel Orientation="Horizontal" Margin="4,2">
-                            <RadioButton Content="US Customary"
+                            <RadioButton GroupName="UnitSystem" Content="US Customary"
                                          IsChecked="{Binding IsUS}"/>
-                            <RadioButton Content="SI / Metric"
+                            <RadioButton GroupName="UnitSystem" Content="SI / Metric"
                                          IsChecked="{Binding IsSI}"/>
                         </StackPanel>
                     </GroupBox>
@@ -100,9 +100,9 @@
                     <!-- Pressure mode -->
                     <GroupBox Grid.Column="1" Header="Pressure Mode">
                         <StackPanel Orientation="Horizontal" Margin="4,2">
-                            <RadioButton Content="Absolute"
+                            <RadioButton GroupName="PressureMode" Content="Absolute"
                                          IsChecked="{Binding IsAbsolute}"/>
-                            <RadioButton Content="Gauge"
+                            <RadioButton GroupName="PressureMode" Content="Gauge"
                                          IsChecked="{Binding IsGauge}"/>
                         </StackPanel>
                     </GroupBox>
@@ -144,7 +144,7 @@
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}"
                                            Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve W_ls"
+                                <RadioButton Grid.Row="0" Grid.Column="3" GroupName="WeightSolve" Content="Solve W_ls"
                                              IsChecked="{Binding SolveWls}" VerticalAlignment="Center"/>
 
                                 <!-- W_dw -->
@@ -158,7 +158,7 @@
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}"
                                            Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve W_dw"
+                                <RadioButton Grid.Row="1" Grid.Column="3" GroupName="WeightSolve" Content="Solve W_dw"
                                              IsChecked="{Binding SolveWdw}" VerticalAlignment="Center"/>
 
                                 <!-- W_tot -->
@@ -172,7 +172,7 @@
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}"
                                            Text="{Binding WeightUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="2" Grid.Column="3" Content="Solve W_tot"
+                                <RadioButton Grid.Row="2" Grid.Column="3" GroupName="WeightSolve" Content="Solve W_tot"
                                              IsChecked="{Binding SolveWtot}" VerticalAlignment="Center"/>
                             </Grid>
                         </GroupBox>
@@ -184,11 +184,11 @@
                                     <ColumnDefinition Width="130"/>
                                     <ColumnDefinition Width="95"/>
                                     <ColumnDefinition Width="55"/>
-                                    <ColumnDefinition Width="130"/>
-                                    <ColumnDefinition Width="95"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
@@ -199,23 +199,23 @@
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
 
-                                <TextBlock Grid.Row="0" Grid.Column="3" Style="{StaticResource FieldLabel}" Text="Trans. CG  TCG"    VerticalAlignment="Center" Margin="0,3"/>
-                                <TextBox   Grid.Row="0" Grid.Column="4" Style="{StaticResource InputBox}"
-                                           Text="{Binding TCG, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
-                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
-                                <TextBlock Grid.Row="0" Grid.Column="5" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-
-                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Vert. CG fwd VCGf"  VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Trans. CG  TCG"    VerticalAlignment="Center" Margin="0,3"/>
                                 <TextBox   Grid.Row="1" Grid.Column="1" Style="{StaticResource InputBox}"
-                                           Text="{Binding VCGf, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           Text="{Binding TCG, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
 
-                                <TextBlock Grid.Row="1" Grid.Column="3" Style="{StaticResource FieldLabel}" Text="Vert. CG csh VCGc"  VerticalAlignment="Center" Margin="0,3"/>
-                                <TextBox   Grid.Row="1" Grid.Column="4" Style="{StaticResource InputBox}"
+                                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Vert. CG fwd  VCGf" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="2" Grid.Column="1" Style="{StaticResource InputBox}"
+                                           Text="{Binding VCGf, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
+                                           LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
+                                <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Vert. CG csh  VCGc" VerticalAlignment="Center" Margin="0,3"/>
+                                <TextBox   Grid.Row="3" Grid.Column="1" Style="{StaticResource InputBox}"
                                            Text="{Binding VCGc, StringFormat=F3, UpdateSourceTrigger=LostFocus}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
-                                <TextBlock Grid.Row="1" Grid.Column="5" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
                             </Grid>
                         </GroupBox>
 
@@ -245,7 +245,7 @@
                                            Background="{Binding LcEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve L_c" IsChecked="{Binding SolveLc}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" GroupName="GeometrySolve" Content="Solve L_c" IsChecked="{Binding SolveLc}" VerticalAlignment="Center"/>
 
                                 <!-- B_c -->
                                 <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion beam    B_c" VerticalAlignment="Center" Margin="0,3"/>
@@ -255,7 +255,7 @@
                                            Background="{Binding BcEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve B_c" IsChecked="{Binding SolveBc}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" GroupName="GeometrySolve" Content="Solve B_c" IsChecked="{Binding SolveBc}" VerticalAlignment="Center"/>
 
                                 <!-- A_c -->
                                 <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion area    A_c" VerticalAlignment="Center" Margin="0,3"/>
@@ -265,7 +265,7 @@
                                            Background="{Binding AcEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding AreaUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="2" Grid.Column="3" Content="Solve A_c" IsChecked="{Binding SolveAc}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="2" Grid.Column="3" GroupName="GeometrySolve" Content="Solve A_c" IsChecked="{Binding SolveAc}" VerticalAlignment="Center"/>
 
                                 <!-- D_sk -->
                                 <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Skirt depth     D_sk" VerticalAlignment="Center" Margin="0,3"/>
@@ -275,7 +275,7 @@
                                            Background="{Binding DskEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="3" Grid.Column="3" Content="Solve D_sk" IsChecked="{Binding SolveDsk}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="3" Grid.Column="3" GroupName="DepthSolve" Content="Solve D_sk" IsChecked="{Binding SolveDsk}" VerticalAlignment="Center"/>
 
                                 <!-- D_ag -->
                                 <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Air gap depth   D_ag" VerticalAlignment="Center" Margin="0,3"/>
@@ -285,7 +285,7 @@
                                            Background="{Binding DagEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="4" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="4" Grid.Column="3" Content="Solve D_ag" IsChecked="{Binding SolveDag}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="4" Grid.Column="3" GroupName="DepthSolve" Content="Solve D_ag" IsChecked="{Binding SolveDag}" VerticalAlignment="Center"/>
 
                                 <!-- D_c -->
                                 <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Cushion depth   D_c" VerticalAlignment="Center" Margin="0,3"/>
@@ -295,7 +295,7 @@
                                            Background="{Binding DcEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="5" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding LengthUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="5" Grid.Column="3" Content="Solve D_c" IsChecked="{Binding SolveDc}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="5" Grid.Column="3" GroupName="DepthSolve" Content="Solve D_c" IsChecked="{Binding SolveDc}" VerticalAlignment="Center"/>
                             </Grid>
                         </GroupBox>
 
@@ -383,7 +383,7 @@
                                            Background="{Binding PcaEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding PressureUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve p_ca" IsChecked="{Binding SolvePca}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" GroupName="PressureSolve" Content="Solve p_ca" IsChecked="{Binding SolvePca}" VerticalAlignment="Center"/>
 
                                 <!-- delta_p -->
                                 <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Pressure diff.  Δp" VerticalAlignment="Center" Margin="0,3"/>
@@ -393,7 +393,7 @@
                                            Background="{Binding DeltaPEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding DeltaPUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve Δp" IsChecked="{Binding SolveDeltaP}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" GroupName="PressureSolve" Content="Solve Δp" IsChecked="{Binding SolveDeltaP}" VerticalAlignment="Center"/>
 
                                 <!-- theta (reserved) -->
                                 <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Skirt angle  θ" VerticalAlignment="Center" Margin="0,3"/>
@@ -455,7 +455,7 @@
                                            Background="{Binding EtaEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="[ — ]" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="0" Grid.Column="3" Content="Solve η" IsChecked="{Binding SolveEta}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="0" Grid.Column="3" GroupName="FanSolve" Content="Solve η" IsChecked="{Binding SolveEta}" VerticalAlignment="Center"/>
 
                                 <!-- P_f -->
                                 <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource FieldLabel}" Text="Fan power  P_f" VerticalAlignment="Center" Margin="0,3"/>
@@ -465,7 +465,7 @@
                                            Background="{Binding PfEnabled, Converter={StaticResource BoolToFieldBrush}}"
                                            LostFocus="InputField_LostFocus" KeyDown="InputField_KeyDown" Margin="0,3"/>
                                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource UnitLabel}" Text="{Binding PowerUnit}" VerticalAlignment="Center"/>
-                                <RadioButton Grid.Row="1" Grid.Column="3" Content="Solve P_f" IsChecked="{Binding SolvePf}" VerticalAlignment="Center"/>
+                                <RadioButton Grid.Row="1" Grid.Column="3" GroupName="FanSolve" Content="Solve P_f" IsChecked="{Binding SolvePf}" VerticalAlignment="Center"/>
 
                                 <!-- Reserved fan geometry row -->
                                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
